@@ -4,7 +4,7 @@
     <title></title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="css/style.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
   </head>
   <body>
   <h1>Orientation Sensor</h1>
@@ -23,7 +23,22 @@
     <p>X: <span id="mag-x"></span></p>
     <p>Y: <span id="mag-y"></span></p>
     <p>Z: <span id="mag-z"></span></p>
+  <h1>ALtitude Test</h1>
+    <p>Value: <span id="altitude"></span></p>
+
   <script>
+    var x = document.getElementById("altitude");
+    function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    altitude.innerHTML = "Geolocation is not supported by this browser.";
+  }
+}
+function showPosition(position) {
+  altitude.innerHTML = "Latitude: " + position.coords.latitude +
+  "<br>Longitude: " + position.coords.longitude;
+}
       // Check if the browser supports the necessary APIs
       if (window.DeviceOrientationEvent && window.DeviceMotionEvent) {
 
