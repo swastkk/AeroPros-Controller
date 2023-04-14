@@ -1,94 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <title></title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="style.css" rel="stylesheet">
+    <title>Mobile Sensors Test</title>
   </head>
   <body>
-  <h1>Orientation Sensor</h1>
-    
-    <p>Alpha: <span id="alpha"></span></p>
-    <p>Beta: <span id="beta"></span></p>
-    <p>Gamma: <span id="gamma"></span></p>
-
-
-  <h1>GyroScope Sensor</h1>
-    <p>Alpha: <span id="gyro-alpha"></span></p>
-    <p>Beta: <span id="gyro-beta"></span></p>
-    <p>Gamma: <span id="gyro-gamma"></span></p>
-
-  <h1>Magnetometer Sensor</h1>
-    <p>X: <span id="mag-x"></span></p>
-    <p>Y: <span id="mag-y"></span></p>
-    <p>Z: <span id="mag-z"></span></p>
-  <h1>ALtitude Test</h1>
-    <p>Value: <span id="altitude"></span></p>
-
-  <script>
-    var x = document.getElementById("altitude");
-    function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  } else {
-    altitude.innerHTML = "Geolocation is not supported by this browser.";
-  }
-}
-function showPosition(position) {
-  altitude.innerHTML = "Latitude: " + position.coords.latitude +
-  "<br>Longitude: " + position.coords.longitude;
-}
-      // Check if the browser supports the necessary APIs
-      if (window.DeviceOrientationEvent && window.DeviceMotionEvent) {
-
-        // Add event listeners to listen for sensor data
-        window.addEventListener('deviceorientation', handleOrientation);
-        window.addEventListener('devicemotion', handleMotion);
-
-        // Define the event handlers
-        function handleOrientation(event) {
-          // Get the orientation data
-          var orientation = {
-            alpha: event.alpha,
-            beta: event.beta,
-            gamma: event.gamma
-          };
-
-          // Get the magnetometer data
-          var magnetometer = {
-            x: event.magnetometer.x,
-            y: event.magnetometer.y,
-            z: event.magnetometer.z
-          };
-
-          // Update the HTML elements with the sensor data
-          document.getElementById('alpha').textContent = orientation.alpha;
-          document.getElementById('beta').textContent = orientation.beta;
-          document.getElementById('gamma').textContent = orientation.gamma;
-
-          document.getElementById('mag-x').textContent = magnetometer.x;
-          document.getElementById('mag-y').textContent = magnetometer.y;
-          document.getElementById('mag-z').textContent = magnetometer.z;
-        }
-
-        function handleMotion(event) {
-          // Get the gyroscope data
-          var gyroscope = {
-            alpha: event.rotationRate.alpha,
-            beta: event.rotationRate.beta,
-            gamma: event.rotationRate.gamma
-          };
-
-          // Update the HTML elements with the sensor data
-          document.getElementById('gyro-alpha').textContent = gyroscope.alpha;
-          document.getElementById('gyro-beta').textContent = gyroscope.beta;
-          document.getElementById('gyro-gamma').textContent = gyroscope.gamma;
-        }
-
-      } else {
-        // The browser doesn't support the necessary APIs
-        console.error('DeviceOrientationEvent or DeviceMotionEvent not supported');
+    <h1>Mobile Sensors Test</h1>
+    <h2>Device orientation data:</h2>
+    <p>alpha: <span id="alpha">0</span></p>
+    <p>beta: <span id="beta">0</span></p>
+    <p>gamma: <span id="gamma">0</span></p>
+    <hr>
+    <h2>Gyroscope data:</h2>
+    <p>x: <span id="gyro-x">0</span></p>
+    <p>y: <span id="gyro-y">0</span></p>
+    <p>z: <span id="gyro-z">0</span></p>
+    <hr>
+    <h2>Magnetometer data:</h2>
+    <p>x: <span id="mag-x">0</span></p>
+    <p>y: <span id="mag-y">0</span></p>
+    <p>z: <span id="mag-z">0</span></p>
+    <hr>
+    <h3>Altitude: <span id="altitude">0</span></h3>
+    <script>
+      if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', function(event) {
+          document.getElementById('alpha').innerHTML = event.alpha;
+          document.getElementById('beta').innerHTML = event.beta;
+          document.getElementById('gamma').innerHTML = event.gamma;
+        });
       }
-    </script></body>
+
+      if (window.DeviceOrientationEvent && window.AbsoluteOrientationSensor && window.Gyroscope && window.Magnetometer) {
+        const sensor = new AbsoluteOrientationSensor({frequency: 60});
+        const gyro = new Gyroscope({frequency: 60});
+        const mag = new Magnetometer({frequency: 60});
+        sensor.onreading = () => {
+          document.getElementById('alpha').innerHTML = sensor.quaternion[0];
+          document.getElementById('beta').innerHTML = sensor.quaternion[1];
+          document.getElementById('gamma').innerHTML = sensor.quaternion[2];
+        };
+        gyro.onreading = () => {
+          document.getElementById('gyro-x').innerHTML = gyro.x;
+          document.getElementById('gyro-y').innerHTML = gyro.y;
+          document.getElementById('gyro-z').innerHTML = gyro.z;
+        };
+        mag.onreading = () => {
+          document.getElementById('mag-x').innerHTML = mag.x;
+          document.getElementById('mag-y').innerHTML = mag.y;
+          document.getElementById('mag-z').innerHTML = mag.z;
+        };
+        sensor.start();
+        gyro.start();
+        mag.start();
+      } else {
+        console.log('Sensors not supported.');
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var altitude = position.coords.altitude;
+          document.getElementById('altitude').innerHTML = altitude;
+        });
+      } else {
+        console.log('Geolocation is not supported.');
+      }
+    </script>
+  </body>
 </html>
